@@ -77,37 +77,155 @@ def _render_citations(citations: list) -> None:
 st.markdown(
     """
     <style>
-        /* ── General ── */
-        [data-testid="stSidebar"] { background: #0d1b2a; }
-        [data-testid="stSidebar"] * { color: #e0e6f0 !important; }
+        /* ══ Google Font ══════════════════════════════════════════════════════ */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-        /* ── Citation cards ── */
-        .citation-card {
-            background: #f0f5ff;
-            border-left: 4px solid #2563eb;
-            border-radius: 6px;
-            padding: 0.55rem 0.9rem;
-            margin: 0.35rem 0;
-            font-size: 0.85rem;
-            color: #1e3a5f;
+        /* ══ Root / body ══════════════════════════════════════════════════════ */
+        html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+        .main .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 960px; }
+
+        /* ══ Sidebar ══════════════════════════════════════════════════════════ */
+        [data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            border-right: 1px solid #334155;
         }
+        [data-testid="stSidebar"] * { color: #cbd5e1 !important; }
+        [data-testid="stSidebar"] h1,
+        [data-testid="stSidebar"] h2,
+        [data-testid="stSidebar"] h3 { color: #f1f5f9 !important; letter-spacing: -0.3px; }
+        [data-testid="stSidebar"] hr { border-color: #334155 !important; }
+        /* active nav item highlight */
+        [data-testid="stSidebar"] [data-testid="stRadio"] label:has(input:checked) {
+            background: rgba(37,99,235,0.25);
+            border-radius: 8px;
+            padding: 4px 8px;
+        }
+        /* config code block in sidebar */
+        [data-testid="stSidebar"] code {
+            background: rgba(255,255,255,0.07) !important;
+            border-radius: 6px;
+            font-size: 0.78rem !important;
+            color: #93c5fd !important;
+        }
+        /* sidebar metric cards */
+        [data-testid="stSidebar"] [data-testid="stMetric"] {
+            background: rgba(255,255,255,0.06) !important;
+            border: 1px solid #334155 !important;
+            border-radius: 10px;
+        }
+        [data-testid="stSidebar"] [data-testid="stMetricValue"] { color: #60a5fa !important; }
+
+        /* ══ Page titles ══════════════════════════════════════════════════════ */
+        h1 { color: #0f172a !important; font-weight: 700 !important; letter-spacing: -0.5px; }
+        h2 { color: #1e40af !important; font-weight: 600 !important; }
+        h3 { color: #1e3a8a !important; font-weight: 600 !important; }
+
+        /* ══ Metric cards (main area) ═════════════════════════════════════════ */
+        [data-testid="stMetric"] {
+            background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+            border: 1px solid #bfdbfe;
+            border-radius: 14px;
+            padding: 1.2rem 1.4rem;
+            box-shadow: 0 1px 4px rgba(37,99,235,0.08);
+        }
+        [data-testid="stMetricLabel"]  { color: #64748b !important; font-size: 0.82rem !important; text-transform: uppercase; letter-spacing: 0.5px; }
+        [data-testid="stMetricValue"]  { color: #1d4ed8 !important; font-weight: 700 !important; }
+
+        /* ══ Citation cards ═══════════════════════════════════════════════════ */
+        .citation-card {
+            background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            margin: 0.4rem 0;
+            font-size: 0.84rem;
+            color: #1e3a5f;
+            box-shadow: 0 1px 3px rgba(59,130,246,0.1);
+            transition: box-shadow 0.2s;
+        }
+        .citation-card:hover { box-shadow: 0 2px 8px rgba(59,130,246,0.2); }
         .citation-card strong { color: #1d4ed8; }
 
-        /* ── Status badges ── */
-        .badge-success { color: #15803d; font-weight: 600; }
-        .badge-skip    { color: #92400e; font-weight: 600; }
-        .badge-error   { color: #b91c1c; font-weight: 600; }
+        /* ══ Chat messages ════════════════════════════════════════════════════ */
+        [data-testid="stChatMessage"] {
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+        }
+        [data-testid="stChatInput"] > div {
+            border: 2px solid #bfdbfe;
+            border-radius: 14px;
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+            transition: border-color 0.2s;
+        }
+        [data-testid="stChatInput"] > div:focus-within { border-color: #3b82f6; }
+        [data-testid="stChatInput"] textarea { font-size: 1rem; }
 
-        /* ── Metric cards ── */
-        [data-testid="stMetric"] {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+        /* ══ Buttons ══════════════════════════════════════════════════════════ */
+        [data-testid="stButton"] > button[kind="primary"] {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            border: none;
             border-radius: 10px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.35);
+            transition: box-shadow 0.2s, transform 0.1s;
+        }
+        [data-testid="stButton"] > button[kind="primary"]:hover {
+            box-shadow: 0 4px 16px rgba(37,99,235,0.45);
+            transform: translateY(-1px);
+        }
+        [data-testid="stButton"] > button:not([kind="primary"]) {
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            font-weight: 500;
+            transition: background 0.15s;
+        }
+        [data-testid="stButton"] > button:not([kind="primary"]):hover { background: #f1f5f9; }
+
+        /* ══ File uploader ════════════════════════════════════════════════════ */
+        [data-testid="stFileUploader"] {
+            border: 2px dashed #93c5fd;
+            border-radius: 14px;
+            background: #f0f7ff;
             padding: 1rem;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        [data-testid="stFileUploader"]:hover {
+            border-color: #3b82f6;
+            background: #e0eeff;
         }
 
-        /* ── Chat input ── */
-        [data-testid="stChatInput"] textarea { font-size: 1rem; }
+        /* ══ Progress bar ════════════════════════════════════════════════════ */
+        [data-testid="stProgress"] > div > div {
+            background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 99px;
+        }
+        [data-testid="stProgress"] { border-radius: 99px; }
+
+        /* ══ Expanders ════════════════════════════════════════════════════════ */
+        [data-testid="stExpander"] {
+            border: 1px solid #dde8ff !important;
+            border-radius: 10px !important;
+            background: #fafcff;
+            box-shadow: 0 1px 3px rgba(37,99,235,0.05);
+        }
+        [data-testid="stExpander"] summary {
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+
+        /* ══ Alert / info / success boxes ════════════════════════════════════ */
+        [data-testid="stAlert"][data-baseweb="notification"] {
+            border-radius: 10px !important;
+        }
+
+        /* ══ Divider ══════════════════════════════════════════════════════════ */
+        hr { border-color: #e2e8f0 !important; }
+
+        /* ══ Caption / small text ════════════════════════════════════════════ */
+        [data-testid="stCaptionContainer"] { color: #94a3b8 !important; font-size: 0.78rem !important; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -122,8 +240,20 @@ if "messages" not in st.session_state:
 # Sidebar
 # ══════════════════════════════════════════════════════════════════════════════
 with st.sidebar:
-    st.markdown("## 🏥 Humana Agent")
-    st.markdown("*Enterprise Agentic RAG*")
+    st.markdown(
+        """
+        <div style="padding:1.1rem 0.5rem 0.8rem; text-align:center;">
+            <div style="font-size:2.2rem; margin-bottom:0.2rem;">🏥</div>
+            <div style="font-size:1.25rem; font-weight:700; color:#f1f5f9;
+                        letter-spacing:-0.4px;">Humana Agent</div>
+            <div style="font-size:0.75rem; color:#94a3b8; margin-top:0.15rem;
+                        text-transform:uppercase; letter-spacing:0.8px;">
+                Enterprise Agentic RAG
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.divider()
 
     page = st.radio(
@@ -157,11 +287,16 @@ with st.sidebar:
 # Page: Upload Documents
 # ══════════════════════════════════════════════════════════════════════════════
 if page == "📤 Upload Documents":
-    st.title("📤 Upload Documents")
     st.markdown(
-        "Upload one or more PDF documents. "
-        "Already-ingested files are detected automatically via SHA-256 hash "
-        "and skipped — no duplicates will ever enter the vector store."
+        """<div style="background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 60%,#3b82f6 100%);
+            border-radius:16px;padding:1.6rem 2rem;margin-bottom:1.5rem;
+            box-shadow:0 4px 20px rgba(37,99,235,0.3);">
+            <h1 style="color:#fff!important;margin:0;font-size:1.7rem;">📤 Upload Documents</h1>
+            <p style="color:#bfdbfe;margin:0.3rem 0 0;font-size:0.9rem;">
+                Drag-and-drop PDFs to ingest them into the knowledge base.
+                Duplicate files are detected automatically via SHA-256 hash.
+            </p></div>""",
+        unsafe_allow_html=True,
     )
 
     uploaded_files = st.file_uploader(
@@ -243,7 +378,17 @@ if page == "📤 Upload Documents":
 # Page: Chat
 # ══════════════════════════════════════════════════════════════════════════════
 elif page == "💬 Chat":
-    st.title("💬 Chat")
+    st.markdown(
+        """<div style="background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 60%,#1d4ed8 100%);
+            border-radius:16px;padding:1.6rem 2rem;margin-bottom:1.5rem;
+            box-shadow:0 4px 20px rgba(15,23,42,0.3);">
+            <h1 style="color:#fff!important;margin:0;font-size:1.7rem;">💬 Chat</h1>
+            <p style="color:#93c5fd;margin:0.3rem 0 0;font-size:0.9rem;">
+                Ask questions about your uploaded documents.
+                Responses include inline citations and relevance scores.
+            </p></div>""",
+        unsafe_allow_html=True,
+    )
 
     col_title, col_clear = st.columns([8, 1])
     with col_clear:
@@ -328,8 +473,17 @@ elif page == "💬 Chat":
 # Page: Document Registry
 # ══════════════════════════════════════════════════════════════════════════════
 elif page == "📚 Document Registry":
-    st.title("📚 Document Registry")
-    st.markdown("All documents that have been ingested into the knowledge base.")
+    st.markdown(
+        """<div style="background:linear-gradient(135deg,#064e3b 0%,#065f46 60%,#047857 100%);
+            border-radius:16px;padding:1.6rem 2rem;margin-bottom:1.5rem;
+            box-shadow:0 4px 20px rgba(6,78,59,0.3);">
+            <h1 style="color:#fff!important;margin:0;font-size:1.7rem;">📚 Document Registry</h1>
+            <p style="color:#6ee7b7;margin:0.3rem 0 0;font-size:0.9rem;">
+                All documents indexed in the knowledge base.
+                Expand any row to view details or remove the document.
+            </p></div>""",
+        unsafe_allow_html=True,
+    )
 
     try:
         store = get_vector_store()

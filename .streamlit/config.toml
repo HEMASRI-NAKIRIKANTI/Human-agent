@@ -2,8 +2,8 @@
 maxUploadSize = 200          # MB — allow large PDF uploads
 
 [theme]
-primaryColor        = "#2563eb"
-backgroundColor     = "#ffffff"
-secondaryBackgroundColor = "#f0f4ff"
-textColor           = "#1e293b"
-font                = "sans serif"
+primaryColor             = "#2563eb"
+backgroundColor          = "#f8fafc"
+secondaryBackgroundColor = "#eef2ff"
+textColor                = "#0f172a"
+font                     = "sans serif"
