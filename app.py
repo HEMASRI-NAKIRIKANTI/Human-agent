@@ -318,6 +318,41 @@ with st.sidebar:
     except Exception:
         st.caption("Vector store not yet initialised.")
 
+    # ── API Key panel ─────────────────────────────────────────────────────────
+    st.divider()
+    _key_in_env = bool(os.environ.get("OPENAI_API_KEY", "").strip())
+    _key_status_html = (
+        '<span style="color:#4ade80;font-weight:700;">● SET</span>'
+        if _key_in_env else
+        '<span style="color:#f87171;font-weight:700;">● NOT SET</span>'
+    )
+    st.markdown(
+        f'<div style="font-size:0.7rem;color:#64748b;text-transform:uppercase;'
+        f'letter-spacing:0.8px;margin-bottom:0.4rem;">🔑 OpenAI API Key &nbsp;{_key_status_html}</div>',
+        unsafe_allow_html=True,
+    )
+    with st.expander("Set / update key", expanded=not _key_in_env):
+        _new_key = st.text_input(
+            "API Key",
+            type="password",
+            placeholder="sk-proj-...",
+            label_visibility="collapsed",
+            key="api_key_input",
+        )
+        if st.button("Apply Key", use_container_width=True, type="primary", key="apply_key_btn"):
+            _clean = _new_key.strip()
+            if _clean.startswith("sk-") and len(_clean) > 20:
+                os.environ["OPENAI_API_KEY"] = _clean
+                st.success("Key applied for this session.")
+                st.rerun()
+            else:
+                st.error("Key must start with 'sk-' and be at least 20 characters.")
+        st.caption(
+            "Key is stored in memory only — not saved to disk. "
+            "For permanent use, add it to your `.env` file or "
+            "[Streamlit Cloud secrets](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/secrets-management)."
+        )
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Page: Upload Documents
@@ -334,6 +369,14 @@ if page == "📤 Upload Documents":
             </p></div>""",
         unsafe_allow_html=True,
     )
+
+    if not os.environ.get("OPENAI_API_KEY", "").strip():
+        st.warning(
+            "⚠️ **OpenAI API key not set.** Enter your key in the **🔑 OpenAI API Key** "
+            "panel in the sidebar before uploading.",
+            icon="🔑",
+        )
+        st.stop()
 
     uploaded_files = st.file_uploader(
         "Drop PDF files here",
@@ -445,6 +488,9 @@ elif page == "💬 Chat":
 
     # ── Chat input ────────────────────────────────────────────────────────────
     if query := st.chat_input("Ask a question about your documents…"):
+        if not os.environ.get("OPENAI_API_KEY", "").strip():
+            st.warning("⚠️ Set your OpenAI API key in the sidebar first.", icon="🔑")
+            st.stop()
         st.session_state.messages.append({"role": "user", "content": query})
 
         with st.chat_message("user"):
