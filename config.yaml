@@ -1,0 +1,75 @@
+# =============================================================================
+# Humana Agent — Master Configuration
+# All runtime settings live here. No code changes needed for LLM/model swaps.
+# =============================================================================
+
+# ─── LLM ─────────────────────────────────────────────────────────────────────
+llm:
+  provider: openai              # openai | azure | anthropic
+  model: gpt-4o
+  temperature: 0.2
+  max_tokens: 2048
+  api_key_env: OPENAI_API_KEY   # env var name (never hardcode keys)
+ 
+
+# ─── Embeddings ───────────────────────────────────────────────────────────────
+embeddings:
+  provider: openai
+  model: text-embedding-3-large
+  dimensions: 3072              # max dims for text-embedding-3-large
+  batch_size: 100               # texts per API call
+  api_key_env: OPENAI_API_KEY
+
+# ─── Vector Store ─────────────────────────────────────────────────────────────
+vector_store:
+  provider: chroma              # chroma | faiss (future)
+  persist_directory: ./data/chroma_db
+  collection_name: humana_docs
+  distance_metric: cosine       # cosine | l2 | ip
+
+# ─── Ingestion Pipeline ───────────────────────────────────────────────────────
+ingestion:
+  chunk_size: 1000              # characters per chunk
+  chunk_overlap: 200            # overlap between consecutive chunks
+  extract_images: true          # extract embedded images from PDFs
+  ocr_enabled: true             # enable OCR for scanned pages
+  ocr_language: eng             # tesseract language code
+  ocr_dpi: 300                  # DPI for page-to-image conversion
+  min_text_chars_for_digital: 50  # pages with fewer chars are treated as scanned
+  json_output_dir: ./data/extracted_json
+  registry_path: ./data/ingestion_registry.json
+
+# ─── Retriever ────────────────────────────────────────────────────────────────
+retriever:
+  top_k: 5                      # number of chunks to retrieve
+  score_threshold: 0.30         # minimum similarity score (0-1)
+  search_type: similarity       # similarity | mmr
+
+# ─── Guardrails ───────────────────────────────────────────────────────────────
+guardrails:
+  check_relevance: true
+  relevance_threshold: 0.35     # minimum keyword-overlap score (0-1)
+  check_toxicity: true
+  use_openai_moderation: true   # false = regex fallback
+  max_retries: 2                # generator retry attempts on validation fail
+  off_topic_response: >
+    I can only answer questions based on the documents that have been uploaded.
+    Please ensure your question relates to the available knowledge base.
+  toxicity_response: >
+    I'm unable to respond to that type of request.
+
+# ─── Prompts ──────────────────────────────────────────────────────────────────
+prompts:
+  system: |
+    You are a professional enterprise assistant with access to a curated document knowledge base.
+    Answer questions accurately and concisely based ONLY on the provided context.
+    After each factual claim, include an inline citation in this exact format: [Source: <filename>, Page <number>]
+    If the context does not contain sufficient information to answer the question, clearly state:
+    "I don't have enough information in the provided documents to answer this question."
+    Never fabricate or infer information beyond what is explicitly stated in the context.
+    Maintain a professional, neutral tone at all times.
+
+# ─── Logging ──────────────────────────────────────────────────────────────────
+logging:
+  level: INFO                   # DEBUG | INFO | WARNING | ERROR
+  log_file: ./data/logs/app.log

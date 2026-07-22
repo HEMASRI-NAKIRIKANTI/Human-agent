@@ -1,0 +1,25 @@
+# Environment
+.env
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Runtime data (never commit — rebuilt on first run)
+data/chroma_db/
+data/extracted_json/
+data/ingestion_registry.json
+data/logs/
+
+# Keep the data folder itself
+!data/.gitkeep
+
+# Streamlit secrets (never commit)
+.streamlit/secrets.toml
+
+# OS
+.DS_Store
+Thumbs.db
