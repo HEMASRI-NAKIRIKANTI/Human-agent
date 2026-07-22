@@ -23,7 +23,7 @@ from pathlib import Path
 import streamlit as st
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)  # always prefer .env over any pre-set env var
 
 # ── Inject Streamlit Cloud secrets into os.environ (no-op on local dev) ──────
 try:
@@ -263,13 +263,49 @@ with st.sidebar:
     )
 
     st.divider()
-    st.markdown("**Active Configuration**")
-    st.code(
-        f"LLM     : {config.llm.provider} / {config.llm.model}\n"
-        f"Embed   : {config.embeddings.model}\n"
-        f"VectorDB: {config.vector_store.provider}\n"
-        f"Top-K   : {config.retriever.top_k}",
-        language="yaml",
+    st.markdown(
+        f"""
+        <div style="background:rgba(255,255,255,0.06);border:1px solid #334155;
+                    border-radius:12px;padding:0.9rem 1rem;margin-top:0.2rem;">
+            <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;
+                        color:#64748b;text-transform:uppercase;margin-bottom:0.65rem;">
+                ⚙️ Active Configuration
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.45rem;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:0.75rem;color:#94a3b8;">LLM</span>
+                    <span style="font-size:0.75rem;font-weight:600;color:#60a5fa;
+                                 background:rgba(96,165,250,0.12);border-radius:5px;
+                                 padding:1px 7px;">{config.llm.model}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:0.75rem;color:#94a3b8;">Provider</span>
+                    <span style="font-size:0.75rem;font-weight:600;color:#a78bfa;
+                                 background:rgba(167,139,250,0.12);border-radius:5px;
+                                 padding:1px 7px;">{config.llm.provider}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:0.75rem;color:#94a3b8;">Embeddings</span>
+                    <span style="font-size:0.75rem;font-weight:600;color:#34d399;
+                                 background:rgba(52,211,153,0.1);border-radius:5px;
+                                 padding:1px 7px;">{config.embeddings.model}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:0.75rem;color:#94a3b8;">Vect or DB</span>
+                    <span style="font-size:0.75rem;font-weight:600;color:#fb923c;
+                                 background:rgba(251,146,60,0.12);border-radius:5px;
+                                 padding:1px 7px;">{config.vector_store.provider}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:0.75rem;color:#94a3b8;">Top-K</span>
+                    <span style="font-size:0.75rem;font-weight:600;color:#f1f5f9;
+                                 background:rgba(241,245,249,0.1);border-radius:5px;
+                                 padding:1px 7px;">{config.retriever.top_k}</span>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
     st.divider()
